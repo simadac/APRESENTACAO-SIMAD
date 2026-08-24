@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIMAD — Sprint Review</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              purple: '#4f46e5',
+              purpleDark: '#3730a3',
+              purpleLight: '#eef2ff',
+              orange: '#ea580c',
+              orangeLight: '#fff7ed',
+              ink: '#0b1020',
+              paper: '#f8fafc',
+              green: '#16a34a',
+              amber: '#f59e0b',
+              red: '#dc2626'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html, body { scroll-behavior: smooth; }
+    body {
+      background-color: #f8fafc;
+      color: #1e293b;
+      font-size: 18px;
+      line-height: 1.55;
+    }
+    .grid-overlay {
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(79,70,229,0.06), transparent 40%),
+        radial-gradient(circle at 80% 90%, rgba(234,88,12,0.05), transparent 40%),
+        linear-gradient(to right, rgba(100,116,139,0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(100,116,139,0.06) 1px, transparent 1px);
+      background-size: auto, auto, 56px 56px, 56px 56px;
+    }
+    .card { box-shadow: 0 1px 2px rgba(15,23,42,0.04), 0 14px 40px -18px rgba(15,23,42,0.18); }
+    .chip {
+      display:inline-flex; align-items:center; gap:.5rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+      font-size: .82rem; padding: .55rem 1rem; border-radius: 9999px;
+      border: 1px solid;
+    }
+    .h-section { font-family:'Space Grotesk',sans-serif; font-weight:700; letter-spacing:-0.02em; }
+    section { scroll-snap-align: start; }
+    html { scroll-snap-type: y proximity; }
+    .gradient-text {
+      background: linear-gradient(90deg,#4f46e5,#ea580c);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .lead { font-size: 1.35rem; line-height: 1.55; color:#334155; font-weight: 400; }
+    @media (min-width: 1024px){ .lead { font-size: 1.55rem; } }
+
+    .status-card {
+      border: 1px solid #e2e8f0;
+      background: rgba(255,255,255,.92);
+      border-radius: 1.5rem;
+      padding: 1.25rem;
+    }
+    .status-dot {
+      width: .8rem; height: .8rem; border-radius: 9999px; display:inline-block;
+    }
+    .evidence-placeholder {
+      border: 2px dashed #cbd5e1;
+      background: repeating-linear-gradient(135deg,#ffffff 0 18px,#f8fafc 18px 36px);
+      border-radius: 1.5rem;
+      min-height: 220px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding: 1.5rem;
+      color: #64748b;
+    }
+    .speaker-note {
+      border-left: 4px solid #4f46e5;
+      background: rgba(238,242,255,.8);
+      color: #3730a3;
+      border-radius: 1rem;
+      padding: 1rem 1.25rem;
+      font-size: .98rem;
+    }
+    .flow-arrow { color:#cbd5e1; font-size:2.4rem; line-height:1; }
+  </style>
+
+  <!-- =========================================================
+       ÁREA PRINCIPAL DE EDIÇÃO
+       ---------------------------------------------------------
+       Para atualizar a apresentação, altere SOMENTE os valores
+       abaixo. Não é necessário mexer no CSS ou na estrutura.
+       ========================================================= -->
+  <script>
+    const APRESENTACAO = {
+      projeto: "SIMAD",
+      subtitulo: "<span id="cfg-subtitulo">Review da Sprint 1 — Migração para Laravel</span>",
+      descricao: "<span id="cfg-descricao">Entregas, evidências, decisões técnicas, impedimentos e próximos passos.</span>",
+      disciplina: "Análise e Projeto de Sistemas",
+      entrega: "28/08/2026",
+
+      integrantes: [
+        "Hiandra Bispo",
+        "Jeyson Alves",
+        "Letícia Carvalheiro",
+        "Maria Clara Lima",
+        "Taíssa Ribeiro"
+      ],
+
+      // STATUS: use "Concluído", "Parcialmente concluído" ou "Não concluído"
+      status: {
+        migracao: "Parcialmente concluído",
+        registro: "Parcialmente concluído",
+        triagem: "Parcialmente concluído",
+        alertas: "Parcialmente concluído",
+        mapa: "Não concluído"
+      },
+
+      observacoes: {
+        migracao: "Arquivos, banco, .env, usuário MySQL e backup encaminhados.",
+        registro: "Funcionalidade contemplada, aguardando teste no Laravel.",
+        triagem: "Fluxo previsto, aguardando validação de status e histórico.",
+        alertas: "Módulo contemplado, pendente de teste no novo ambiente.",
+        mapa: "Permanecerá no backlog para a próxima Sprint."
+      },
+
+      impedimento: "<span id="cfg-impedimento">A liberação do SSH pela HostGator ficou pendente, impedindo a execução do Composer, geração da APP_KEY, ajuste de permissões/caches, Document Root e testes finais.</span>",
+
+      proximosPassos: [
+        "Concluir deploy",
+        "Testar Must Have",
+        "Concluir mapa"
+      ],
+
+      // Quando tiver evidências, coloque aqui uma URL ou caminho de imagem.
+      // Ex.: "img/registro-ocorrencia.png"
+      evidencias: {
+        principal: "",
+        registro: "",
+        fluxo: ""
+      }
+    };
+  </script>
+
+</head>
+
+<body class="antialiased grid-overlay selection:bg-brand-purple/15 selection:text-brand-purpleDark">
+  <!-- Barra de progresso -->
+  <div id="progress-bar" class="fixed top-0 left-0 h-1.5 bg-gradient-to-r from-brand-purple via-fuchsia-500 to-brand-orange z-50 transition-[width] duration-300" style="width: 0%;"></div>
+
+  <!-- HUD apresentador + timer -->
+  <div class="fixed top-5 right-5 bg-white/85 backdrop-blur-xl border border-slate-200 card rounded-full px-5 py-3 z-50 flex items-center gap-4 text-sm">
+    <div class="flex items-center gap-2">
+      <span class="relative flex h-2.5 w-2.5">
+        <span class="absolute inline-flex h-full w-full rounded-full bg-brand-purple opacity-60 animate-ping"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-purple"></span>
+      </span>
+      <span id="active-presenter" class="text-brand-purpleDark font-extrabold tracking-[0.18em] uppercase">REVIEW</span>
+    </div>
+    <span class="text-slate-300">|</span>
+    <span id="timer" class="text-slate-700 font-mono font-bold bg-slate-100 px-3 py-1 rounded-full border border-slate-200">07:00</span>
+    <span class="text-slate-300 hidden md:inline">|</span>
+    <span id="slide-counter" class="hidden md:inline text-slate-500 font-mono font-semibold">1 / 6</span>
+  </div>
+
+  <!-- SLIDE 1 -->
+  <section id="sec-s1" class="min-h-screen flex flex-col justify-center items-center px-6 relative bg-white">
+    <div class="text-center max-w-5xl opacity-0 translate-y-12 init-anim">
+      <span class="chip text-brand-orange bg-brand-orangeLight border-orange-200 mb-8">Sprint Review</span>
+      <h1 class="h-section text-7xl md:text-[9rem] font-extrabold text-brand-ink leading-none mt-6">
+        SI<span class="gradient-text">MAD</span>
+      </h1>
+      <p class="mt-6 text-2xl md:text-3xl text-slate-600 max-w-3xl mx-auto leading-snug">
+        Review da Sprint 1 — Migração para Laravel
+      </p>
+      <p class="mt-3 text-lg text-slate-400 leading-snug">
+        Entregas, evidências, decisões técnicas, impedimentos e próximos passos.
+      </p>
+
+      <div class="mt-12 flex flex-wrap justify-center gap-3">
+        <span class="bg-slate-100 text-slate-700 text-sm px-4 py-2 rounded-full font-semibold border border-slate-200">Hiandra Bispo</span>
+        <span class="bg-slate-100 text-slate-700 text-sm px-4 py-2 rounded-full font-semibold border border-slate-200">Jeyson Alves</span>
+        <span class="bg-slate-100 text-slate-700 text-sm px-4 py-2 rounded-full font-semibold border border-slate-200">Letícia Carvalheiro</span>
+        <span class="bg-slate-100 text-slate-700 text-sm px-4 py-2 rounded-full font-semibold border border-slate-200">Maria Clara Lima</span>
+        <span class="bg-slate-100 text-slate-700 text-sm px-4 py-2 rounded-full font-semibold border border-slate-200">Taíssa Ribeiro</span>
+      </div>
+
+      <p class="mt-8 text-sm text-slate-400 tracking-[0.2em] uppercase font-semibold"><span id="cfg-rodape">Análise e Projeto de Sistemas · Entrega 28/08/2026</span></p>
+    </div>
+    <div class="absolute bottom-10 animate-bounce text-slate-400 text-sm flex flex-col items-center font-semibold tracking-widest uppercase">
+      <span class="mb-2">Deslize para baixo</span>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+    </div>
+  </section>
+
+  <!-- SLIDE 2 -->
+  <section id="sec-s2" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 bg-slate-50 border-y border-slate-200">
+    <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+      <div>
+        <span class="chip text-brand-purpleDark bg-brand-purpleLight border-brand-purple/20">Planejamento da Sprint</span>
+        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6 mb-8 leading-[1.05]">
+          O que foi <span class="text-brand-purple">planejado</span>
+        </h2>
+        <p class="lead mb-8">
+          A Sprint priorizou os itens obrigatórios do MVP definidos no MoSCoW, com foco principal na migração do SIMAD para Laravel e na preservação do banco existente.
+        </p>
+        <div class="speaker-note">
+          <strong>Fala sugerida:</strong> “A Sprint foi orientada pelos Must Have. O foco central foi preparar a aplicação para Laravel sem perder os dados e mantendo os fluxos principais do SIMAD.”
+        </div>
+      </div>
+
+      <div class="bg-white p-8 rounded-3xl border border-slate-200 card">
+        <h3 class="h-section text-2xl text-brand-ink border-b pb-4 border-slate-100 mb-5">Must Have planejados</h3>
+        <div class="space-y-4">
+          <div class="flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
+            <span class="font-display font-bold text-brand-purpleDark">01</span>
+            <p class="text-slate-700">Migrar o código atual para <strong>Laravel na HostGator</strong>, mantendo MySQL/MariaDB e dados existentes.</p>
+          </div>
+          <div class="flex gap-4 p-4 rounded-2xl bg-orange-50 border border-orange-100">
+            <span class="font-display font-bold text-brand-orange">02</span>
+            <p class="text-slate-700">Registrar ocorrência com <strong>protocolo, geolocalização e validação</strong>.</p>
+          </div>
+          <div class="flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
+            <span class="font-display font-bold text-brand-purpleDark">03</span>
+            <p class="text-slate-700">Consultar, triar, atualizar status e histórico conforme perfil.</p>
+          </div>
+          <div class="flex gap-4 p-4 rounded-2xl bg-orange-50 border border-orange-100">
+            <span class="font-display font-bold text-brand-orange">04</span>
+            <p class="text-slate-700">Criar alertas manuais e visualizar alertas ativos.</p>
+          </div>
+          <div class="flex gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <span class="font-display font-bold text-slate-600">05</span>
+            <p class="text-slate-700">Implementar mapa interativo básico com ocorrências e alertas ativos.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3 -->
+  <section id="sec-s3" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 bg-white">
+    <div class="max-w-7xl mx-auto w-full">
+      <div class="text-center max-w-4xl mx-auto mb-10">
+        <span class="chip text-brand-orange bg-brand-orangeLight border-orange-200">Entregas da Sprint</span>
+        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6">O que foi efetivamente entregue</h2>
+        <p class="lead mt-4">Status provisório até a validação funcional da aplicação Laravel no ambiente da HostGator.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="status-card">
+          <span class="status-dot bg-brand-amber"></span>
+          <h3 class="h-section text-xl text-brand-ink mt-4">Migração Laravel</h3>
+          <p id="status-migracao" class="text-sm text-slate-500 mt-2">Parcialmente concluído</p>
+          <p id="obs-migracao" class="text-base text-slate-600 mt-4">Arquivos, banco, .env, usuário MySQL e backup encaminhados.</p>
+        </div>
+        <div class="status-card">
+          <span class="status-dot bg-brand-amber"></span>
+          <h3 class="h-section text-xl text-brand-ink mt-4">Registro</h3>
+          <p id="status-registro" class="text-sm text-slate-500 mt-2">Parcialmente concluído</p>
+          <p id="obs-registro" class="text-base text-slate-600 mt-4">Funcionalidade contemplada, aguardando teste no Laravel.</p>
+        </div>
+        <div class="status-card">
+          <span class="status-dot bg-brand-amber"></span>
+          <h3 class="h-section text-xl text-brand-ink mt-4">Triagem</h3>
+          <p id="status-triagem" class="text-sm text-slate-500 mt-2">Parcialmente concluído</p>
+          <p id="obs-triagem" class="text-base text-slate-600 mt-4">Fluxo previsto, aguardando validação de status e histórico.</p>
+        </div>
+        <div class="status-card">
+          <span class="status-dot bg-brand-amber"></span>
+          <h3 class="h-section text-xl text-brand-ink mt-4">Alertas</h3>
+          <p id="status-alertas" class="text-sm text-slate-500 mt-2">Parcialmente concluído</p>
+          <p id="obs-alertas" class="text-base text-slate-600 mt-4">Módulo contemplado, pendente de teste no novo ambiente.</p>
+        </div>
+        <div class="status-card">
+          <span class="status-dot bg-brand-red"></span>
+          <h3 class="h-section text-xl text-brand-ink mt-4">Mapa</h3>
+          <p id="status-mapa" class="text-sm text-slate-500 mt-2">Não concluído</p>
+          <p id="obs-mapa" class="text-base text-slate-600 mt-4">Permanecerá no backlog para a próxima Sprint.</p>
+        </div>
+      </div>
+
+      <div class="mt-8 p-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900">
+        <strong>Observação:</strong> se a migração estiver concluída e testada até 28/08, este slide deve ser atualizado com o status real de cada funcionalidade.
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4 -->
+  <section id="sec-s4" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 bg-slate-50 border-y border-slate-200">
+    <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <span class="chip text-brand-purpleDark bg-brand-purpleLight border-brand-purple/20">Evidências</span>
+        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6 mb-6 leading-[1.05]">
+          O que será <span class="text-brand-purple">demonstrado</span>
+        </h2>
+        <p class="lead mb-6">
+          As evidências devem mostrar somente o que estiver funcionando no ambiente Laravel após a implantação.
+        </p>
+        <div class="speaker-note">
+          <strong>Fala sugerida:</strong> “Nesta parte, vamos mostrar as evidências funcionais. Caso alguma funcionalidade ainda esteja em teste, ela será apresentada como pendência, não como entrega concluída.”
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-5">
+        <div class="evidence-placeholder">
+          <div>
+            <strong class="h-section text-brand-ink text-xl">Evidência 1</strong>
+            <p class="mt-2">Print ou demonstração da aplicação Laravel publicada na HostGator.</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="evidence-placeholder min-h-[160px]">
+            <div>
+              <strong class="h-section text-brand-ink">Evidência 2</strong>
+              <p class="mt-2 text-sm">Registro de ocorrência / protocolo.</p>
+            </div>
+          </div>
+          <div class="evidence-placeholder min-h-[160px]">
+            <div>
+              <strong class="h-section text-brand-ink">Evidência 3</strong>
+              <p class="mt-2 text-sm">Status, histórico ou alerta ativo.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5 -->
+  <section id="sec-s5" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 bg-white">
+    <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+      <div>
+        <span class="chip text-brand-orange bg-brand-orangeLight border-orange-200">Decisões e impedimentos</span>
+        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6 mb-8 leading-[1.05]">
+          O que aprendemos na Sprint
+        </h2>
+        <p class="lead">
+          A Sprint confirmou que a prioridade técnica não era adicionar novas funcionalidades, mas estabilizar a base do SIMAD em Laravel.
+        </p>
+      </div>
+
+      <div class="space-y-5">
+        <div class="p-6 rounded-3xl bg-brand-purpleLight border border-brand-purple/20 card">
+          <h3 class="h-section text-2xl text-brand-purpleDark mb-4">Decisões técnicas</h3>
+          <ul class="space-y-3 text-brand-purpleDark/85">
+            <li>• Migrar o SIMAD para Laravel mantendo PHP como base.</li>
+            <li>• Preservar o MySQL/MariaDB e os dados existentes.</li>
+            <li>• Manter a HostGator/cPanel como infraestrutura inicial.</li>
+            <li>• Validar os Must Have antes de avançar nos Should Have.</li>
+          </ul>
+        </div>
+
+        <div class="p-6 rounded-3xl bg-brand-orangeLight border border-orange-200 card">
+          <h3 class="h-section text-2xl text-brand-orange mb-4">Impedimento principal</h3>
+          <p class="text-orange-900">
+            A liberação do SSH pela HostGator ficou pendente, impedindo a execução do Composer, geração da APP_KEY, ajuste de permissões/caches, Document Root e testes finais.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6 -->
+  <section id="sec-s6" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 bg-slate-50 border-y border-slate-200">
+    <div class="max-w-7xl mx-auto w-full">
+      <div class="text-center max-w-4xl mx-auto mb-14">
+        <span class="chip text-brand-purpleDark bg-brand-purpleLight border-brand-purple/20">Próxima Sprint</span>
+        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6">Plano de continuidade</h2>
+        <p class="lead mt-4">A próxima Sprint deve transformar a migração estrutural em validação funcional completa.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-stretch">
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 card">
+          <div class="h-section text-brand-purple text-3xl mb-3">01</div>
+          <h3 class="h-section text-xl text-brand-ink">Concluir deploy</h3>
+          <p class="text-slate-600 mt-3">Finalizar Composer, APP_KEY, permissões, caches e Document Root.</p>
+        </div>
+        <div class="hidden md:flex items-center justify-center flow-arrow">→</div>
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 card">
+          <div class="h-section text-brand-orange text-3xl mb-3">02</div>
+          <h3 class="h-section text-xl text-brand-ink">Testar Must Have</h3>
+          <p class="text-slate-600 mt-3">Validar ocorrência, triagem, status, histórico e alertas.</p>
+        </div>
+        <div class="hidden md:flex items-center justify-center flow-arrow">→</div>
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 card">
+          <div class="h-section text-brand-purple text-3xl mb-3">03</div>
+          <h3 class="h-section text-xl text-brand-ink">Concluir mapa</h3>
+          <p class="text-slate-600 mt-3">Implementar mapa básico com ocorrências e alertas ativos.</p>
+        </div>
+      </div>
+
+      <div class="mt-12 p-7 rounded-3xl bg-brand-ink text-white card">
+        <h3 class="h-section text-2xl mb-3">Mensagem de fechamento</h3>
+        <p class="text-slate-200 text-xl leading-relaxed">
+          “O objetivo da próxima Sprint é consolidar o SIMAD em Laravel, validar os fluxos essenciais no novo ambiente e concluir as pendências obrigatórias do MVP.”
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Animação inicial
+    gsap.to(".init-anim", { opacity: 1, y: 0, duration: 1, ease: "power3.out", stagger: .12 });
+
+    const sections = gsap.utils.toArray("section");
+    const counter = document.getElementById("slide-counter");
+    const progressBar = document.getElementById("progress-bar");
+
+    sections.forEach((section, index) => {
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top center",
+        end: "bottom center",
+        onEnter: () => updateHUD(index),
+        onEnterBack: () => updateHUD(index)
+      });
+    });
+
+    function updateHUD(index){
+      counter.textContent = `${index + 1} / ${sections.length}`;
+      progressBar.style.width = `${((index + 1) / sections.length) * 100}%`;
+    }
+
+    // Timer de 7 minutos
+    let totalSeconds = 7 * 60;
+    const timerEl = document.getElementById("timer");
+    setInterval(() => {
+      if(totalSeconds <= 0) return;
+      totalSeconds--;
+      const m = String(Math.floor(totalSeconds / 60)).padStart(2,'0');
+      const s = String(totalSeconds % 60).padStart(2,'0');
+      timerEl.textContent = `${m}:${s}`;
+      if(totalSeconds <= 60) timerEl.classList.add("text-brand-red");
+    }, 1000);
+  </script>
+
+  <script>
+    // =========================================================
+    // NÃO PRECISA EDITAR ABAIXO
+    // Aplica automaticamente os valores da área de edição.
+    // =========================================================
+    function aplicarConfiguracao() {
+      const setText = (id, valor) => {
+        const el = document.getElementById(id);
+        if (el && valor !== undefined) el.textContent = valor;
+      };
+
+      setText("cfg-subtitulo", APRESENTACAO.subtitulo);
+      setText("cfg-descricao", APRESENTACAO.descricao);
+      setText("cfg-rodape", `${APRESENTACAO.disciplina} · Entrega ${APRESENTACAO.entrega}`);
+
+      ["migracao","registro","triagem","alertas","mapa"].forEach(chave => {
+        setText(`status-${chave}`, APRESENTACAO.status[chave]);
+        setText(`obs-${chave}`, APRESENTACAO.observacoes[chave]);
+      });
+
+      setText("cfg-impedimento", APRESENTACAO.impedimento);
+    }
+
+    document.addEventListener("DOMContentLoaded", aplicarConfiguracao);
+  </script>
+
+</body>
+</html>
