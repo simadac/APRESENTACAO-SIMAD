@@ -67,5 +67,5 @@ O sistema tem como objetivo apoiar a Defesa Civil de Campo Limpo Paulista/SP no 
 ---
 
 <p align="center">
-  🌦️ <strong>SIMAD — Tecnologia para prevenção, monitoramento e segurança.</strong>
+  🌦️ <strong>SIMAD — Porque segundos salvam vidas </strong>
 </p>
