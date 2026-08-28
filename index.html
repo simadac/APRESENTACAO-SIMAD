@@ -31,6 +31,7 @@
               ink: '#0b1020',
               paper: '#f8fafc',
               green: '#16a34a',
+              greenDark: '#065f46',
               greenLight: '#f0fdf4',
               amber: '#f59e0b',
               red: '#dc2626'
@@ -47,7 +48,7 @@
       background-color: #f8fafc;
       color: #1e293b;
       font-size: 18px;
-      line-height: 1.55;
+      line-height: 1.6;
     }
     .grid-overlay {
       background-image:
@@ -58,6 +59,8 @@
       background-size: auto, auto, 56px 56px, 56px 56px;
     }
     .card { box-shadow: 0 1px 2px rgba(15,23,42,0.04), 0 14px 40px -18px rgba(15,23,42,0.18); }
+    .card-hover { transition: transform .25s ease, box-shadow .25s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 4px 10px rgba(15,23,42,0.06), 0 22px 48px -18px rgba(15,23,42,0.22); }
     .chip {
       display:inline-flex; align-items:center; gap:.5rem;
       font-family: 'Space Grotesk', sans-serif;
@@ -66,33 +69,49 @@
       border: 1px solid;
     }
     .h-section { font-family:'Space Grotesk',sans-serif; font-weight:700; letter-spacing:-0.02em; }
+    .balance { text-wrap: balance; }
     section { scroll-snap-align: start; }
     html { scroll-snap-type: y proximity; }
     .gradient-text {
       background: linear-gradient(90deg,#4f46e5,#ea580c);
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
-    .lead { font-size: 1.35rem; line-height: 1.55; color:#334155; font-weight: 400; }
+    .lead { font-size: 1.35rem; line-height: 1.6; color:#334155; font-weight: 400; }
     @media (min-width: 1024px){ .lead { font-size: 1.55rem; } }
 
     .status-card {
       border: 1px solid #e2e8f0;
       background: rgba(255,255,255,.92);
       border-radius: 1.5rem;
-      padding: 1.25rem;
+      padding: 1.5rem;
     }
-    .status-dot {
-      width: .8rem; height: .8rem; border-radius: 9999px; display:inline-block;
+    .status-icon {
+      width: 2.25rem; height: 2.25rem; border-radius: 9999px;
+      display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0;
     }
+    .status-icon svg { width: 1.05rem; height: 1.05rem; }
     .speaker-note {
       border-left: 4px solid #4f46e5;
       background: rgba(238,242,255,.8);
       color: #3730a3;
       border-radius: 1rem;
-      padding: 1rem 1.25rem;
+      padding: 1.1rem 1.35rem;
       font-size: .98rem;
     }
-    .flow-arrow { color:#cbd5e1; font-size:2.4rem; line-height:1; }
+    .icon-badge {
+      width: 2.5rem; height: 2.5rem; border-radius: .9rem;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .icon-badge svg { width: 1.2rem; height: 1.2rem; }
+    .timeline-rail { position:absolute; left: 1.125rem; top: .5rem; bottom: .5rem; width: 1px; background: #e2e8f0; }
+    .reveal-item { opacity: 0; transform: translateY(22px); }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+    }
+    a:focus-visible, button:focus-visible, iframe:focus-visible {
+      outline: 2px solid #4f46e5; outline-offset: 3px; border-radius: .5rem;
+    }
   </style>
 
   <!-- =========================================================
@@ -154,6 +173,12 @@
       "Parcialmente concluído": "bg-brand-amber",
       "Não concluído": "bg-brand-red"
     };
+
+    const ICONES_STATUS = {
+      "Concluído": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>',
+      "Parcialmente concluído": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12h12"/></svg>',
+      "Não concluído": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+    };
   </script>
 
 </head>
@@ -178,20 +203,27 @@
   </div>
 
   <!-- SLIDE 1 -->
-  <section id="sec-s1" class="min-h-screen flex flex-col justify-center items-center px-6 relative bg-white">
-    <div class="text-center max-w-5xl opacity-0 translate-y-12 init-anim">
-      <span class="chip text-brand-orange bg-brand-orangeLight border-orange-200 mb-8">Sprint Review</span>
+  <section id="sec-s1" class="min-h-screen flex flex-col justify-center items-center px-6 relative bg-white overflow-hidden">
+    <span aria-hidden="true" class="pointer-events-none select-none absolute -top-10 md:top-4 left-1/2 -translate-x-1/2 text-[16rem] md:text-[26rem] font-display font-extrabold text-slate-50 leading-none">01</span>
+
+    <div class="relative text-center max-w-5xl opacity-0 translate-y-12 init-anim">
+      <span class="chip text-brand-orange bg-brand-orangeLight border-orange-200">Sprint Review</span>
       <h1 class="h-section text-7xl md:text-[9rem] font-extrabold text-brand-ink leading-none mt-6">
         SI<span class="gradient-text">MAD</span>
       </h1>
-      <p id="cfg-subtitulo" class="mt-6 text-2xl md:text-3xl text-slate-600 max-w-3xl mx-auto leading-snug">
+      <p id="cfg-subtitulo" class="mt-6 text-2xl md:text-3xl text-slate-600 max-w-3xl mx-auto leading-snug balance">
         Review da Sprint 1 — MVP concluído em Laravel
       </p>
-      <p id="cfg-descricao" class="mt-3 text-lg text-slate-400 leading-snug">
+      <p id="cfg-descricao" class="mt-3 text-lg text-slate-400 leading-snug balance">
         Entregas do MVP, vídeo demonstrativo, decisões técnicas e próximos passos.
       </p>
 
-      <div class="mt-12 flex flex-wrap justify-center gap-3">
+      <div class="mt-7 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-greenLight border border-brand-green/25 text-brand-greenDark font-semibold text-sm">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>
+        MVP concluído · 5/5 Must Have
+      </div>
+
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
         <span class="bg-slate-100 text-slate-700 text-sm px-4 py-2 rounded-full font-semibold border border-slate-200">Hiandra Bispo</span>
         <span class="bg-slate-100 text-slate-700 text-sm px-4 py-2 rounded-full font-semibold border border-slate-200">Jeyson Alves</span>
         <span class="bg-slate-100 text-slate-700 text-sm px-4 py-2 rounded-full font-semibold border border-slate-200">Letícia Brondi</span>
@@ -208,40 +240,46 @@
   </section>
 
   <!-- SLIDE 2 -->
-  <section id="sec-s2" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 bg-slate-50 border-y border-slate-200">
+  <section id="sec-s2" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 py-24 bg-slate-50 border-y border-slate-200">
     <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
       <div>
         <span class="chip text-brand-purpleDark bg-brand-purpleLight border-brand-purple/20">Planejamento da Sprint</span>
-        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6 mb-8 leading-[1.05]">
+        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6 mb-8 leading-[1.05] balance">
           O que foi <span class="text-brand-purple">planejado</span>
         </h2>
-        <p class="lead mb-8">
+        <p class="lead mb-8 balance">
           A Sprint priorizou os itens obrigatórios do MVP definidos no MoSCoW, com foco principal na migração do SIMAD para Laravel e na preservação do banco de dados existente.
         </p>
+        <div class="speaker-note">
+          “A Sprint foi orientada pelos Must Have. O foco central foi preparar a aplicação para Laravel sem perder os dados, mantendo os fluxos principais do SIMAD intactos.”
+        </div>
       </div>
 
       <div class="bg-white p-8 rounded-3xl border border-slate-200 card">
-        <h3 class="h-section text-2xl text-brand-ink border-b pb-4 border-slate-100 mb-5">Must Have planejados</h3>
-        <div class="space-y-4">
-          <div class="flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
-            <span class="font-display font-bold text-brand-purpleDark">01</span>
-            <p class="text-slate-700">Migrar o código atual para <strong>Laravel na HostGator</strong>, mantendo MySQL/MariaDB e os dados existentes.</p>
-          </div>
-          <div class="flex gap-4 p-4 rounded-2xl bg-orange-50 border border-orange-100">
-            <span class="font-display font-bold text-brand-orange">02</span>
-            <p class="text-slate-700">Registrar ocorrência com <strong>protocolo, geolocalização e validação</strong>.</p>
-          </div>
-          <div class="flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
-            <span class="font-display font-bold text-brand-purpleDark">03</span>
-            <p class="text-slate-700">Consultar, triar, atualizar status e histórico conforme o perfil do usuário.</p>
-          </div>
-          <div class="flex gap-4 p-4 rounded-2xl bg-orange-50 border border-orange-100">
-            <span class="font-display font-bold text-brand-orange">04</span>
-            <p class="text-slate-700">Criar alertas manuais e visualizar alertas ativos.</p>
-          </div>
-          <div class="flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
-            <span class="font-display font-bold text-brand-purpleDark">05</span>
-            <p class="text-slate-700">Implementar mapa interativo básico com ocorrências e alertas ativos.</p>
+        <h3 class="h-section text-2xl text-brand-ink border-b pb-4 border-slate-100 mb-6">Must Have planejados</h3>
+        <div class="relative pl-1">
+          <div class="timeline-rail" aria-hidden="true"></div>
+          <div class="space-y-4">
+            <div class="reveal-item relative flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
+              <span class="relative z-10 flex items-center justify-center w-9 h-9 rounded-full bg-brand-purple text-white font-display font-bold text-sm shrink-0">01</span>
+              <p class="text-slate-700 pt-1">Migrar o código atual para <strong>Laravel na HostGator</strong>, mantendo MySQL/MariaDB e os dados existentes.</p>
+            </div>
+            <div class="reveal-item relative flex gap-4 p-4 rounded-2xl bg-orange-50 border border-orange-100">
+              <span class="relative z-10 flex items-center justify-center w-9 h-9 rounded-full bg-brand-orange text-white font-display font-bold text-sm shrink-0">02</span>
+              <p class="text-slate-700 pt-1">Registrar ocorrência com <strong>protocolo, geolocalização e validação</strong>.</p>
+            </div>
+            <div class="reveal-item relative flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
+              <span class="relative z-10 flex items-center justify-center w-9 h-9 rounded-full bg-brand-purple text-white font-display font-bold text-sm shrink-0">03</span>
+              <p class="text-slate-700 pt-1">Consultar, triar, atualizar status e histórico conforme o perfil do usuário.</p>
+            </div>
+            <div class="reveal-item relative flex gap-4 p-4 rounded-2xl bg-orange-50 border border-orange-100">
+              <span class="relative z-10 flex items-center justify-center w-9 h-9 rounded-full bg-brand-orange text-white font-display font-bold text-sm shrink-0">04</span>
+              <p class="text-slate-700 pt-1">Criar alertas manuais e visualizar alertas ativos.</p>
+            </div>
+            <div class="reveal-item relative flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
+              <span class="relative z-10 flex items-center justify-center w-9 h-9 rounded-full bg-brand-purple text-white font-display font-bold text-sm shrink-0">05</span>
+              <p class="text-slate-700 pt-1">Implementar mapa interativo básico com ocorrências e alertas ativos.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -249,57 +287,90 @@
   </section>
 
   <!-- SLIDE 3 -->
-  <section id="sec-s3" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 bg-white">
+  <section id="sec-s3" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 py-24 bg-white">
     <div class="max-w-7xl mx-auto w-full">
-      <div class="text-center max-w-4xl mx-auto mb-10">
+      <div class="text-center max-w-4xl mx-auto mb-12">
         <span class="chip text-brand-orange bg-brand-orangeLight border-orange-200">Entregas da Sprint</span>
-        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6">Todos os itens Must Have foram concluídos</h2>
+        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6 balance">Todos os itens Must Have foram concluídos</h2>
+
+        <div class="mt-8 max-w-md mx-auto text-left">
+          <div class="flex items-center justify-between text-sm font-semibold text-slate-500 mb-2">
+            <span>Progresso do MVP</span>
+            <span>5/5 · 100%</span>
+          </div>
+          <div class="h-3 w-full rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-brand-green to-emerald-400" style="width:100%"></div>
+          </div>
+        </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div class="status-card">
-          <span id="dot-migracao" class="status-dot bg-brand-green"></span>
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
+        <div class="status-card reveal-item card-hover">
+          <div class="flex items-center justify-between">
+            <span id="dot-migracao" class="status-icon bg-brand-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>
+            </span>
+            <span id="badge-migracao" class="text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-brand-greenLight text-brand-greenDark border border-brand-green/25">Concluído</span>
+          </div>
           <h3 class="h-section text-xl text-brand-ink mt-4">Migração Laravel</h3>
-          <p id="status-migracao" class="text-sm text-slate-500 mt-2">Concluído</p>
-          <p id="obs-migracao" class="text-base text-slate-600 mt-4">Migração para Laravel 13 concluída na HostGator: PHP 8.3, banco MySQL/MariaDB conectado e as 18 tabelas validadas como compatíveis.</p>
+          <p id="obs-migracao" class="text-base text-slate-600 mt-3">Migração para Laravel 13 concluída na HostGator: PHP 8.3, banco MySQL/MariaDB conectado e as 18 tabelas validadas como compatíveis. Backup do sistema anterior preservado para rollback.</p>
         </div>
-        <div class="status-card">
-          <span id="dot-registro" class="status-dot bg-brand-green"></span>
+        <div class="status-card reveal-item card-hover">
+          <div class="flex items-center justify-between">
+            <span id="dot-registro" class="status-icon bg-brand-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>
+            </span>
+            <span id="badge-registro" class="text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-brand-greenLight text-brand-greenDark border border-brand-green/25">Concluído</span>
+          </div>
           <h3 class="h-section text-xl text-brand-ink mt-4">Registro</h3>
-          <p id="status-registro" class="text-sm text-slate-500 mt-2">Concluído</p>
-          <p id="obs-registro" class="text-base text-slate-600 mt-4">Registro de ocorrências, com protocolo, geolocalização e validação dos dados, testado e validado em uso real no ambiente Laravel.</p>
+          <p id="obs-registro" class="text-base text-slate-600 mt-3">Registro de ocorrências, com protocolo, geolocalização e validação dos dados, testado e validado em uso real no ambiente Laravel.</p>
         </div>
-        <div class="status-card">
-          <span id="dot-triagem" class="status-dot bg-brand-green"></span>
+        <div class="status-card reveal-item card-hover">
+          <div class="flex items-center justify-between">
+            <span id="dot-triagem" class="status-icon bg-brand-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>
+            </span>
+            <span id="badge-triagem" class="text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-brand-greenLight text-brand-greenDark border border-brand-green/25">Concluído</span>
+          </div>
           <h3 class="h-section text-xl text-brand-ink mt-4">Triagem</h3>
-          <p id="status-triagem" class="text-sm text-slate-500 mt-2">Concluído</p>
-          <p id="obs-triagem" class="text-base text-slate-600 mt-4">Consulta, triagem, atualização de status e histórico testadas de ponta a ponta e validadas conforme o perfil do usuário.</p>
+          <p id="obs-triagem" class="text-base text-slate-600 mt-3">Consulta, triagem, atualização de status e histórico testadas de ponta a ponta e validadas conforme o perfil do usuário.</p>
         </div>
-        <div class="status-card">
-          <span id="dot-alertas" class="status-dot bg-brand-green"></span>
+        <div class="status-card reveal-item card-hover">
+          <div class="flex items-center justify-between">
+            <span id="dot-alertas" class="status-icon bg-brand-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>
+            </span>
+            <span id="badge-alertas" class="text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-brand-greenLight text-brand-greenDark border border-brand-green/25">Concluído</span>
+          </div>
           <h3 class="h-section text-xl text-brand-ink mt-4">Alertas</h3>
-          <p id="status-alertas" class="text-sm text-slate-500 mt-2">Concluído</p>
-          <p id="obs-alertas" class="text-base text-slate-600 mt-4">Criação de alertas manuais e visualização de alertas ativos validadas após a implantação em Laravel.</p>
+          <p id="obs-alertas" class="text-base text-slate-600 mt-3">Criação de alertas manuais e visualização de alertas ativos validadas após a implantação em Laravel.</p>
         </div>
-        <div class="status-card">
-          <span id="dot-mapa" class="status-dot bg-brand-green"></span>
+        <div class="status-card reveal-item card-hover">
+          <div class="flex items-center justify-between">
+            <span id="dot-mapa" class="status-icon bg-brand-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>
+            </span>
+            <span id="badge-mapa" class="text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-brand-greenLight text-brand-greenDark border border-brand-green/25">Concluído</span>
+          </div>
           <h3 class="h-section text-xl text-brand-ink mt-4">Mapa</h3>
-          <p id="status-mapa" class="text-sm text-slate-500 mt-2">Concluído</p>
-          <p id="obs-mapa" class="text-base text-slate-600 mt-4">Mapa interativo básico, com ocorrências e alertas ativos, implementado — concluindo o último item Must Have do MVP.</p>
+          <p id="obs-mapa" class="text-base text-slate-600 mt-3">Mapa interativo básico, com ocorrências e alertas ativos, implementado — concluindo o último item Must Have do MVP.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- SLIDE 4 -->
-  <section id="sec-s4" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 bg-slate-50 border-y border-slate-200">
+  <section id="sec-s4" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 py-24 bg-slate-50 border-y border-slate-200">
     <div class="max-w-5xl mx-auto w-full text-center">
       <span class="chip text-brand-purpleDark bg-brand-purpleLight border-brand-purple/20">Evidência</span>
-      <p class="lead mb-10 max-w-3xl mx-auto">
+      <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6 mb-6 leading-[1.05] balance">
+        O que será <span class="text-brand-purple">demonstrado</span>
+      </h2>
+      <p class="lead mb-10 max-w-3xl mx-auto balance">
         O vídeo a seguir demonstra o SIMAD em funcionamento real no ambiente Laravel: login, registro de ocorrências, triagem/histórico, alertas e o mapa interativo.
       </p>
 
-      <div class="aspect-video w-full rounded-3xl overflow-hidden border border-slate-200 card bg-black">
+      <div class="reveal-item aspect-video w-full rounded-3xl overflow-hidden border border-slate-200 card bg-black">
         <iframe
           class="w-full h-full"
           src="https://www.youtube.com/embed/8ZW5jtqyxjk"
@@ -309,36 +380,57 @@
           allowfullscreen>
         </iframe>
       </div>
+
+      <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500">
+        <span class="inline-flex items-center gap-2">
+          <svg class="w-4 h-4 text-brand-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5z" fill="currentColor" stroke="none"/></svg>
+          Vídeo demonstrativo — SIMAD em produção
+        </span>
+        <a href="https://www.youtube.com/watch?v=8ZW5jtqyxjk" target="_blank" rel="noopener" class="inline-flex items-center gap-1 font-semibold text-brand-purple hover:text-brand-purpleDark transition-colors">
+          Abrir no YouTube
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+        </a>
+      </div>
     </div>
   </section>
 
   <!-- SLIDE 5 -->
-  <section id="sec-s5" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 bg-white">
+  <section id="sec-s5" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 py-24 bg-white">
     <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
       <div>
         <span class="chip text-brand-orange bg-brand-orangeLight border-orange-200">Decisões e aprendizados</span>
-        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6 mb-8 leading-[1.05]">
+        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6 mb-8 leading-[1.05] balance">
           O que aprendemos na Sprint
         </h2>
-        <p class="lead">
+        <p class="lead balance">
           A Sprint confirmou que a prioridade técnica era estabilizar a base do SIMAD em Laravel — e essa meta foi alcançada, com todos os itens Must Have do MVP concluídos e validados.
         </p>
       </div>
 
       <div class="space-y-5">
-        <div class="p-6 rounded-3xl bg-brand-purpleLight border border-brand-purple/20 card">
-          <h3 class="h-section text-2xl text-brand-purpleDark mb-4">Decisões técnicas</h3>
+        <div class="reveal-item p-6 rounded-3xl bg-brand-purpleLight border border-brand-purple/20 card">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="icon-badge bg-brand-purple/10 text-brand-purpleDark">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </span>
+            <h3 class="h-section text-2xl text-brand-purpleDark">Decisões técnicas</h3>
+          </div>
           <ul class="space-y-3 text-brand-purpleDark/85">
-            <li>• Migrar o SIMAD para Laravel mantendo PHP como base.</li>
-            <li>• Preservar o MySQL/MariaDB e os dados existentes.</li>
-            <li>• Manter a HostGator/cPanel como infraestrutura inicial.</li>
-            <li>• Validar os Must Have antes de avançar nos Should Have.</li>
+            <li class="flex gap-2.5"><svg class="w-5 h-5 mt-0.5 shrink-0 text-brand-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg><span>Migrar o SIMAD para Laravel mantendo PHP como base.</span></li>
+            <li class="flex gap-2.5"><svg class="w-5 h-5 mt-0.5 shrink-0 text-brand-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg><span>Preservar o MySQL/MariaDB e os dados existentes.</span></li>
+            <li class="flex gap-2.5"><svg class="w-5 h-5 mt-0.5 shrink-0 text-brand-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg><span>Manter a HostGator/cPanel como infraestrutura inicial.</span></li>
+            <li class="flex gap-2.5"><svg class="w-5 h-5 mt-0.5 shrink-0 text-brand-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg><span>Validar os Must Have antes de avançar nos Should Have.</span></li>
           </ul>
         </div>
 
-        <div class="p-6 rounded-3xl bg-brand-greenLight border border-green-200 card">
-          <h3 class="h-section text-2xl text-brand-green mb-4">Desafio superado</h3>
-          <p id="cfg-impedimento" class="text-green-900">
+        <div class="reveal-item p-6 rounded-3xl bg-brand-greenLight border border-brand-green/20 card">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="icon-badge bg-brand-green/10 text-brand-greenDark">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+            </span>
+            <h3 class="h-section text-2xl text-brand-greenDark">Desafio superado</h3>
+          </div>
+          <p id="cfg-impedimento" class="text-emerald-900">
             A liberação do acesso SSH pela HostGator, que inicialmente estava pendente, foi concluída durante a Sprint. Isso permitiu finalizar a instalação do Composer, a geração da APP_KEY, o ajuste de permissões e caches, a troca do Document Root e os testes finais — colocando a aplicação em produção.
           </p>
         </div>
@@ -347,30 +439,42 @@
   </section>
 
   <!-- SLIDE 6 -->
-  <section id="sec-s6" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 bg-slate-50 border-y border-slate-200">
+  <section id="sec-s6" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 py-24 bg-slate-50 border-y border-slate-200">
     <div class="max-w-7xl mx-auto w-full">
       <div class="text-center max-w-4xl mx-auto mb-14">
         <span class="chip text-brand-purpleDark bg-brand-purpleLight border-brand-purple/20">Próxima Sprint</span>
-        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6">Plano de continuidade</h2>
-        <p class="lead mt-4">Com o MVP concluído, a próxima Sprint foca em uma bateria completa de testes e na correção dos problemas encontrados.</p>
+        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6 balance">Plano de continuidade</h2>
+        <p class="lead mt-4 balance">Com o MVP concluído, a próxima Sprint foca em uma bateria completa de testes e na correção dos problemas encontrados.</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch max-w-3xl mx-auto">
-        <div class="bg-white rounded-3xl border border-slate-200 p-6 card">
-          <div class="h-section text-brand-purple text-3xl mb-3">01</div>
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 items-center max-w-3xl mx-auto">
+        <div class="reveal-item bg-white rounded-3xl border border-slate-200 p-7 card-hover card h-full">
+          <span class="icon-badge bg-brand-purple/10 text-brand-purpleDark mb-4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          </span>
+          <div class="h-section text-brand-purple text-sm tracking-wide uppercase mb-1">Passo 01</div>
           <h3 class="h-section text-xl text-brand-ink">Bateria de testes</h3>
           <p class="text-slate-600 mt-3">Executar uma rodada completa de QA sobre os fluxos do MVP em produção — registro, triagem, alertas e mapa — identificando bugs e pontos de melhoria.</p>
         </div>
-        <div class="hidden md:flex items-center justify-center flow-arrow">→</div>
-        <div class="bg-white rounded-3xl border border-slate-200 p-6 card">
-          <div class="h-section text-brand-orange text-3xl mb-3">02</div>
+
+        <div class="hidden md:flex flex-col items-center gap-1 text-slate-300" aria-hidden="true">
+          <span class="w-10 h-px bg-slate-300"></span>
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+          <span class="w-10 h-px bg-slate-300"></span>
+        </div>
+
+        <div class="reveal-item bg-white rounded-3xl border border-slate-200 p-7 card-hover card h-full">
+          <span class="icon-badge bg-brand-orange/10 text-brand-orange mb-4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.8 2.8-2-2 2.8-2.8z"/></svg>
+          </span>
+          <div class="h-section text-brand-orange text-sm tracking-wide uppercase mb-1">Passo 02</div>
           <h3 class="h-section text-xl text-brand-ink">Trabalhar nas correções</h3>
           <p class="text-slate-600 mt-3">Corrigir os problemas encontrados nos testes e aplicar ajustes de interface e responsividade, preparando o terreno para os itens Should Have.</p>
         </div>
       </div>
 
-      <div class="mt-12 p-7 rounded-3xl bg-brand-ink text-white card">
-        <p class="text-slate-200 text-xl leading-relaxed">
+      <div class="reveal-item mt-12 p-7 rounded-3xl bg-brand-ink text-white card">
+        <p class="text-slate-200 text-xl leading-relaxed balance">
           “O objetivo da próxima Sprint é realizar uma bateria completa de testes sobre o MVP em produção e, em seguida, corrigir os problemas encontrados, consolidando a estabilidade do SIMAD.”
         </p>
       </div>
@@ -379,9 +483,21 @@
 
   <script>
     gsap.registerPlugin(ScrollTrigger);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Animação inicial
-    gsap.to(".init-anim", { opacity: 1, y: 0, duration: 1, ease: "power3.out", stagger: .12 });
+    if (reduceMotion) {
+      gsap.set(".init-anim, .reveal-item", { opacity: 1, y: 0 });
+    } else {
+      gsap.to(".init-anim", { opacity: 1, y: 0, duration: 1, ease: "power3.out", stagger: .12 });
+
+      gsap.utils.toArray(".reveal-item").forEach((el) => {
+        gsap.to(el, {
+          opacity: 1, y: 0, duration: .7, ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 88%" }
+        });
+      });
+    }
 
     const sections = gsap.utils.toArray("section");
     const counter = document.getElementById("slide-counter");
@@ -431,14 +547,15 @@
       setText("cfg-rodape", `${APRESENTACAO.disciplina} · Entrega ${APRESENTACAO.entrega}`);
 
       ["migracao","registro","triagem","alertas","mapa"].forEach(chave => {
-        setText(`status-${chave}`, APRESENTACAO.status[chave]);
+        const status = APRESENTACAO.status[chave];
+        setText(`badge-${chave}`, status);
         setText(`obs-${chave}`, APRESENTACAO.observacoes[chave]);
 
         const dotEl = document.getElementById(`dot-${chave}`);
-        const corClasse = CORES_STATUS[APRESENTACAO.status[chave]] || "bg-brand-amber";
         if (dotEl) {
           dotEl.classList.remove("bg-brand-green", "bg-brand-amber", "bg-brand-red");
-          dotEl.classList.add(corClasse);
+          dotEl.classList.add(CORES_STATUS[status] || "bg-brand-amber");
+          dotEl.innerHTML = ICONES_STATUS[status] || ICONES_STATUS["Parcialmente concluído"];
         }
       });
 
