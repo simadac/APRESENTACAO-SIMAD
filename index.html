@@ -31,6 +31,7 @@
               ink: '#0b1020',
               paper: '#f8fafc',
               green: '#16a34a',
+              greenLight: '#f0fdf4',
               amber: '#f59e0b',
               red: '#dc2626'
             }
@@ -83,18 +84,6 @@
     .status-dot {
       width: .8rem; height: .8rem; border-radius: 9999px; display:inline-block;
     }
-    .evidence-placeholder {
-      border: 2px dashed #cbd5e1;
-      background: repeating-linear-gradient(135deg,#ffffff 0 18px,#f8fafc 18px 36px);
-      border-radius: 1.5rem;
-      min-height: 220px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      padding: 1.5rem;
-      color: #64748b;
-    }
     .speaker-note {
       border-left: 4px solid #4f46e5;
       background: rgba(238,242,255,.8);
@@ -115,51 +104,55 @@
   <script>
     const APRESENTACAO = {
       projeto: "SIMAD",
-      subtitulo: "<span id="cfg-subtitulo">Review da Sprint 1 — Migração para Laravel</span>",
-      descricao: "<span id="cfg-descricao">Entregas, evidências, decisões técnicas, impedimentos e próximos passos.</span>",
+      subtitulo: "Review da Sprint 1 — MVP concluído em Laravel",
+      descricao: "Entregas do MVP, vídeo demonstrativo, decisões técnicas e próximos passos.",
       disciplina: "Análise e Projeto de Sistemas",
       entrega: "28/08/2026",
 
       integrantes: [
         "Hiandra Bispo",
         "Jeyson Alves",
-        "Letícia Carvalheiro",
+        "Letícia Brondi",
         "Maria Clara Lima",
-        "Taíssa Ribeiro"
+        "Taíssa de Pieri"
       ],
 
       // STATUS: use "Concluído", "Parcialmente concluído" ou "Não concluído"
       status: {
-        migracao: "Parcialmente concluído",
-        registro: "Parcialmente concluído",
-        triagem: "Parcialmente concluído",
-        alertas: "Parcialmente concluído",
-        mapa: "Não concluído"
+        migracao: "Concluído",
+        registro: "Concluído",
+        triagem: "Concluído",
+        alertas: "Concluído",
+        mapa: "Concluído"
       },
 
       observacoes: {
-        migracao: "Arquivos, banco, .env, usuário MySQL e backup encaminhados.",
-        registro: "Funcionalidade contemplada, aguardando teste no Laravel.",
-        triagem: "Fluxo previsto, aguardando validação de status e histórico.",
-        alertas: "Módulo contemplado, pendente de teste no novo ambiente.",
-        mapa: "Permanecerá no backlog para a próxima Sprint."
+        migracao: "Migração para Laravel 13 concluída na HostGator: PHP 8.3, banco MySQL/MariaDB conectado e as 18 tabelas validadas como compatíveis. O backup do sistema anterior foi preservado para rollback.",
+        registro: "Registro de ocorrências, com protocolo, geolocalização e validação dos dados, testado e validado em uso real no ambiente Laravel.",
+        triagem: "Consulta, triagem, atualização de status e histórico testadas de ponta a ponta e validadas conforme o perfil do usuário.",
+        alertas: "Criação de alertas manuais e visualização de alertas ativos validadas após a implantação em Laravel.",
+        mapa: "Mapa interativo básico, com ocorrências e alertas ativos, implementado — concluindo o último item Must Have do MVP."
       },
 
-      impedimento: "<span id="cfg-impedimento">A liberação do SSH pela HostGator ficou pendente, impedindo a execução do Composer, geração da APP_KEY, ajuste de permissões/caches, Document Root e testes finais.</span>",
+      // Desafio da sprint, já superado
+      impedimento: "A liberação do acesso SSH pela HostGator, que inicialmente estava pendente, foi concluída durante a Sprint. Isso permitiu finalizar a instalação do Composer, a geração da APP_KEY, o ajuste de permissões e caches, a troca do Document Root e os testes finais — colocando a aplicação em produção.",
 
       proximosPassos: [
-        "Concluir deploy",
-        "Testar Must Have",
-        "Concluir mapa"
+        "Bateria de testes",
+        "Trabalhar nas correções"
       ],
 
-      // Quando tiver evidências, coloque aqui uma URL ou caminho de imagem.
-      // Ex.: "img/registro-ocorrencia.png"
-      evidencias: {
-        principal: "",
-        registro: "",
-        fluxo: ""
+      // Vídeo de evidência (YouTube)
+      evidencia: {
+        youtubeId: "8ZW5jtqyxjk",
+        titulo: "Demonstração do SIMAD em produção — Laravel"
       }
+    };
+
+    const CORES_STATUS = {
+      "Concluído": "bg-brand-green",
+      "Parcialmente concluído": "bg-brand-amber",
+      "Não concluído": "bg-brand-red"
     };
   </script>
 
@@ -191,11 +184,11 @@
       <h1 class="h-section text-7xl md:text-[9rem] font-extrabold text-brand-ink leading-none mt-6">
         SI<span class="gradient-text">MAD</span>
       </h1>
-      <p class="mt-6 text-2xl md:text-3xl text-slate-600 max-w-3xl mx-auto leading-snug">
-        Review da Sprint 1 — Migração para Laravel
+      <p id="cfg-subtitulo" class="mt-6 text-2xl md:text-3xl text-slate-600 max-w-3xl mx-auto leading-snug">
+        Review da Sprint 1 — MVP concluído em Laravel
       </p>
-      <p class="mt-3 text-lg text-slate-400 leading-snug">
-        Entregas, evidências, decisões técnicas, impedimentos e próximos passos.
+      <p id="cfg-descricao" class="mt-3 text-lg text-slate-400 leading-snug">
+        Entregas do MVP, vídeo demonstrativo, decisões técnicas e próximos passos.
       </p>
 
       <div class="mt-12 flex flex-wrap justify-center gap-3">
@@ -223,10 +216,10 @@
           O que foi <span class="text-brand-purple">planejado</span>
         </h2>
         <p class="lead mb-8">
-          A Sprint priorizou os itens obrigatórios do MVP definidos no MoSCoW, com foco principal na migração do SIMAD para Laravel e na preservação do banco existente.
+          A Sprint priorizou os itens obrigatórios do MVP definidos no MoSCoW, com foco principal na migração do SIMAD para Laravel e na preservação do banco de dados existente.
         </p>
         <div class="speaker-note">
-          “A Sprint foi orientada pelos Must Have. O foco central foi preparar a aplicação para Laravel sem perder os dados e mantendo os fluxos principais do SIMAD.”
+          “A Sprint foi orientada pelos Must Have. O foco central foi preparar a aplicação para Laravel sem perder os dados, mantendo os fluxos principais do SIMAD intactos.”
         </div>
       </div>
 
@@ -235,7 +228,7 @@
         <div class="space-y-4">
           <div class="flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
             <span class="font-display font-bold text-brand-purpleDark">01</span>
-            <p class="text-slate-700">Migrar o código atual para <strong>Laravel na HostGator</strong>, mantendo MySQL/MariaDB e dados existentes.</p>
+            <p class="text-slate-700">Migrar o código atual para <strong>Laravel na HostGator</strong>, mantendo MySQL/MariaDB e os dados existentes.</p>
           </div>
           <div class="flex gap-4 p-4 rounded-2xl bg-orange-50 border border-orange-100">
             <span class="font-display font-bold text-brand-orange">02</span>
@@ -243,14 +236,14 @@
           </div>
           <div class="flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
             <span class="font-display font-bold text-brand-purpleDark">03</span>
-            <p class="text-slate-700">Consultar, triar, atualizar status e histórico conforme perfil.</p>
+            <p class="text-slate-700">Consultar, triar, atualizar status e histórico conforme o perfil do usuário.</p>
           </div>
           <div class="flex gap-4 p-4 rounded-2xl bg-orange-50 border border-orange-100">
             <span class="font-display font-bold text-brand-orange">04</span>
             <p class="text-slate-700">Criar alertas manuais e visualizar alertas ativos.</p>
           </div>
-          <div class="flex gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <span class="font-display font-bold text-slate-600">05</span>
+          <div class="flex gap-4 p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
+            <span class="font-display font-bold text-brand-purpleDark">05</span>
             <p class="text-slate-700">Implementar mapa interativo básico com ocorrências e alertas ativos.</p>
           </div>
         </div>
@@ -263,39 +256,39 @@
     <div class="max-w-7xl mx-auto w-full">
       <div class="text-center max-w-4xl mx-auto mb-10">
         <span class="chip text-brand-orange bg-brand-orangeLight border-orange-200">Entregas da Sprint</span>
-        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6">O que foi efetivamente entregue</h2>
+        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6">Todos os itens Must Have foram concluídos</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div class="status-card">
-          <span class="status-dot bg-brand-amber"></span>
+          <span id="dot-migracao" class="status-dot bg-brand-green"></span>
           <h3 class="h-section text-xl text-brand-ink mt-4">Migração Laravel</h3>
           <p id="status-migracao" class="text-sm text-slate-500 mt-2">Concluído</p>
-          <p id="obs-migracao" class="text-base text-slate-600 mt-4">Concluímos a migração, mantendo um backup da versão anterior e validamos a conexão com o banco de dados, onde obtivemos sucesso.</p>
+          <p id="obs-migracao" class="text-base text-slate-600 mt-4">Migração para Laravel 13 concluída na HostGator: PHP 8.3, banco MySQL/MariaDB conectado e as 18 tabelas validadas como compatíveis. Backup do sistema anterior preservado para rollback.</p>
         </div>
         <div class="status-card">
-          <span class="status-dot bg-brand-amber"></span>
+          <span id="dot-registro" class="status-dot bg-brand-green"></span>
           <h3 class="h-section text-xl text-brand-ink mt-4">Registro</h3>
           <p id="status-registro" class="text-sm text-slate-500 mt-2">Concluído</p>
-          <p id="obs-registro" class="text-base text-slate-600 mt-4">Testado e validado em uso real no ambiente Laravel em produção.</p>
+          <p id="obs-registro" class="text-base text-slate-600 mt-4">Registro de ocorrências, com protocolo, geolocalização e validação dos dados, testado e validado em uso real no ambiente Laravel.</p>
         </div>
         <div class="status-card">
-          <span class="status-dot bg-brand-amber"></span>
+          <span id="dot-triagem" class="status-dot bg-brand-green"></span>
           <h3 class="h-section text-xl text-brand-ink mt-4">Triagem</h3>
           <p id="status-triagem" class="text-sm text-slate-500 mt-2">Concluído</p>
-          <p id="obs-triagem" class="text-base text-slate-600 mt-4">Fluxos testados de ponta a ponta e validados no novo ambiente.</p>
+          <p id="obs-triagem" class="text-base text-slate-600 mt-4">Consulta, triagem, atualização de status e histórico testadas de ponta a ponta e validadas conforme o perfil do usuário.</p>
         </div>
         <div class="status-card">
-          <span class="status-dot bg-brand-amber"></span>
+          <span id="dot-alertas" class="status-dot bg-brand-green"></span>
           <h3 class="h-section text-xl text-brand-ink mt-4">Alertas</h3>
           <p id="status-alertas" class="text-sm text-slate-500 mt-2">Concluído</p>
-          <p id="obs-alertas" class="text-base text-slate-600 mt-4">Funcionalidade validada após a implantação em Laravel.</p>
+          <p id="obs-alertas" class="text-base text-slate-600 mt-4">Criação de alertas manuais e visualização de alertas ativos validadas após a implantação em Laravel.</p>
         </div>
         <div class="status-card">
-          <span class="status-dot bg-brand-red"></span>
+          <span id="dot-mapa" class="status-dot bg-brand-green"></span>
           <h3 class="h-section text-xl text-brand-ink mt-4">Mapa</h3>
           <p id="status-mapa" class="text-sm text-slate-500 mt-2">Concluído</p>
-          <p id="obs-mapa" class="text-base text-slate-600 mt-4">Implementado, completando o último item Must Have pendente do MVP.</p>
+          <p id="obs-mapa" class="text-base text-slate-600 mt-4">Mapa interativo básico, com ocorrências e alertas ativos, implementado — concluindo o último item Must Have do MVP.</p>
         </div>
       </div>
     </div>
@@ -303,38 +296,24 @@
 
   <!-- SLIDE 4 -->
   <section id="sec-s4" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 bg-slate-50 border-y border-slate-200">
-    <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      <div>
-        <span class="chip text-brand-purpleDark bg-brand-purpleLight border-brand-purple/20">Evidências</span>
-        <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6 mb-6 leading-[1.05]">
-          O que será <span class="text-brand-purple">demonstrado</span>
-        </h2>
-        <p class="lead mb-6">
-          As evidências mostram o MVP funcionando no ambiente Laravel após a implantação.
-        </p>
-      </div>
+    <div class="max-w-5xl mx-auto w-full text-center">
+      <span class="chip text-brand-purpleDark bg-brand-purpleLight border-brand-purple/20">Evidência</span>
+      <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6 mb-6 leading-[1.05]">
+        O que será <span class="text-brand-purple">demonstrado</span>
+      </h2>
+      <p class="lead mb-10 max-w-3xl mx-auto">
+        O vídeo a seguir demonstra o SIMAD em funcionamento real no ambiente Laravel: login, registro de ocorrências, triagem/histórico, alertas e o mapa interativo.
+      </p>
 
-      <div class="grid grid-cols-1 gap-5">
-        <div class="evidence-placeholder">
-          <div>
-            <strong class="h-section text-brand-ink text-xl">Evidência 1</strong>
-            <p class="mt-2">Print ou demonstração da aplicação Laravel publicada na HostGator.</p>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div class="evidence-placeholder min-h-[160px]">
-            <div>
-              <strong class="h-section text-brand-ink">Evidência 2</strong>
-              <p class="mt-2 text-sm">Registro de ocorrência / protocolo.</p>
-            </div>
-          </div>
-          <div class="evidence-placeholder min-h-[160px]">
-            <div>
-              <strong class="h-section text-brand-ink">Evidência 3</strong>
-              <p class="mt-2 text-sm">Status, histórico ou alerta ativo.</p>
-            </div>
-          </div>
-        </div>
+      <div class="aspect-video w-full rounded-3xl overflow-hidden border border-slate-200 card bg-black">
+        <iframe
+          class="w-full h-full"
+          src="https://www.youtube.com/embed/8ZW5jtqyxjk"
+          title="Demonstração do SIMAD em produção — Laravel"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
       </div>
     </div>
   </section>
@@ -343,12 +322,12 @@
   <section id="sec-s5" class="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 bg-white">
     <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
       <div>
-        <span class="chip text-brand-orange bg-brand-orangeLight border-orange-200">Decisões e impedimentos</span>
+        <span class="chip text-brand-orange bg-brand-orangeLight border-orange-200">Decisões e aprendizados</span>
         <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6 mb-8 leading-[1.05]">
           O que aprendemos na Sprint
         </h2>
         <p class="lead">
-          A Sprint confirmou que a prioridade técnica não era adicionar novas funcionalidades, mas estabilizar a base do SIMAD em Laravel.
+          A Sprint confirmou que a prioridade técnica era estabilizar a base do SIMAD em Laravel — e essa meta foi alcançada, com todos os itens Must Have do MVP concluídos e validados.
         </p>
       </div>
 
@@ -363,10 +342,10 @@
           </ul>
         </div>
 
-        <div class="p-6 rounded-3xl bg-brand-orangeLight border border-orange-200 card">
-          <h3 class="h-section text-2xl text-brand-orange mb-4">Impedimento principal</h3>
-          <p class="text-orange-900">
-            A liberação do SSH pela HostGator ficou pendente, impedindo a execução do Composer, geração da APP_KEY, ajuste de permissões/caches, Document Root e testes finais.
+        <div class="p-6 rounded-3xl bg-brand-greenLight border border-green-200 card">
+          <h3 class="h-section text-2xl text-brand-green mb-4">Desafio superado</h3>
+          <p id="cfg-impedimento" class="text-green-900">
+            A liberação do acesso SSH pela HostGator, que inicialmente estava pendente, foi concluída durante a Sprint. Isso permitiu finalizar a instalação do Composer, a geração da APP_KEY, o ajuste de permissões e caches, a troca do Document Root e os testes finais — colocando a aplicação em produção.
           </p>
         </div>
       </div>
@@ -379,33 +358,27 @@
       <div class="text-center max-w-4xl mx-auto mb-14">
         <span class="chip text-brand-purpleDark bg-brand-purpleLight border-brand-purple/20">Próxima Sprint</span>
         <h2 class="h-section text-5xl md:text-6xl text-brand-ink mt-6">Plano de continuidade</h2>
-        <p class="lead mt-4">A próxima Sprint deve transformar a migração estrutural em validação funcional completa.</p>
+        <p class="lead mt-4">Com o MVP concluído, a próxima Sprint foca em uma bateria completa de testes e na correção dos problemas encontrados.</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-stretch">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch max-w-3xl mx-auto">
         <div class="bg-white rounded-3xl border border-slate-200 p-6 card">
           <div class="h-section text-brand-purple text-3xl mb-3">01</div>
-          <h3 class="h-section text-xl text-brand-ink">Concluir deploy</h3>
-          <p class="text-slate-600 mt-3">Finalizar Composer, APP_KEY, permissões, caches e Document Root.</p>
+          <h3 class="h-section text-xl text-brand-ink">Bateria de testes</h3>
+          <p class="text-slate-600 mt-3">Executar uma rodada completa de QA sobre os fluxos do MVP em produção — registro, triagem, alertas e mapa — identificando bugs e pontos de melhoria.</p>
         </div>
         <div class="hidden md:flex items-center justify-center flow-arrow">→</div>
         <div class="bg-white rounded-3xl border border-slate-200 p-6 card">
           <div class="h-section text-brand-orange text-3xl mb-3">02</div>
-          <h3 class="h-section text-xl text-brand-ink">Testar Must Have</h3>
-          <p class="text-slate-600 mt-3">Validar ocorrência, triagem, status, histórico e alertas.</p>
-        </div>
-        <div class="hidden md:flex items-center justify-center flow-arrow">→</div>
-        <div class="bg-white rounded-3xl border border-slate-200 p-6 card">
-          <div class="h-section text-brand-purple text-3xl mb-3">03</div>
-          <h3 class="h-section text-xl text-brand-ink">Concluir mapa</h3>
-          <p class="text-slate-600 mt-3">Implementar mapa básico com ocorrências e alertas ativos.</p>
+          <h3 class="h-section text-xl text-brand-ink">Trabalhar nas correções</h3>
+          <p class="text-slate-600 mt-3">Corrigir os problemas encontrados nos testes e aplicar ajustes de interface e responsividade, preparando o terreno para os itens Should Have.</p>
         </div>
       </div>
 
       <div class="mt-12 p-7 rounded-3xl bg-brand-ink text-white card">
         <h3 class="h-section text-2xl mb-3">Mensagem de fechamento</h3>
         <p class="text-slate-200 text-xl leading-relaxed">
-          “O objetivo da próxima Sprint é consolidar o SIMAD em Laravel, validar os fluxos essenciais no novo ambiente e concluir as pendências obrigatórias do MVP.”
+          “O objetivo da próxima Sprint é realizar uma bateria completa de testes sobre o MVP em produção e, em seguida, corrigir os problemas encontrados, consolidando a estabilidade do SIMAD.”
         </p>
       </div>
     </div>
@@ -436,7 +409,7 @@
       progressBar.style.width = `${((index + 1) / sections.length) * 100}%`;
     }
 
-    // Timer de 7 minutos
+    // Timer de 7 minutos (tempo máximo da apresentação)
     let totalSeconds = 7 * 60;
     const timerEl = document.getElementById("timer");
     setInterval(() => {
@@ -467,9 +440,22 @@
       ["migracao","registro","triagem","alertas","mapa"].forEach(chave => {
         setText(`status-${chave}`, APRESENTACAO.status[chave]);
         setText(`obs-${chave}`, APRESENTACAO.observacoes[chave]);
+
+        const dotEl = document.getElementById(`dot-${chave}`);
+        const corClasse = CORES_STATUS[APRESENTACAO.status[chave]] || "bg-brand-amber";
+        if (dotEl) {
+          dotEl.classList.remove("bg-brand-green", "bg-brand-amber", "bg-brand-red");
+          dotEl.classList.add(corClasse);
+        }
       });
 
       setText("cfg-impedimento", APRESENTACAO.impedimento);
+
+      const iframe = document.querySelector('#sec-s4 iframe');
+      if (iframe && APRESENTACAO.evidencia && APRESENTACAO.evidencia.youtubeId) {
+        iframe.src = `https://www.youtube.com/embed/${APRESENTACAO.evidencia.youtubeId}`;
+        iframe.title = APRESENTACAO.evidencia.titulo || iframe.title;
+      }
     }
 
     document.addEventListener("DOMContentLoaded", aplicarConfiguracao);
